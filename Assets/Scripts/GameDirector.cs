@@ -13,14 +13,18 @@ public class GameDirector : MonoBehaviour
     public Text upgradeAnnouncementText;
     public Text upgradeItemText;
     public Text upgradeItemDescription;
+    public Text waveNumberText;
+
     public PlayerController player;
     public PrimaryWeapon primaryWeapon;
 
     private int _currentLevel;
     private int _enemyBudget;
+    private int maxSimultaneousSpawns = 1;
     private float _nextLevelTimer;
     private float _timeBetweenLevels = 5.0f;
-    private float _enemySpawnCooldown = 3.0f;
+    private float _defaultSpawnCooldown = 3.0f;
+    private float _enemySpawnCooldown;
     private float _minimumEnemySpawnTime = 0.45f;
     private float _currentLevelTimer;
     private float _nextSpawnTime;
@@ -33,11 +37,13 @@ public class GameDirector : MonoBehaviour
 
     private string STRING_ENEMIES_REMAINING = "Enemies remaining: ";
     private string STRING_NEXT_LEVEL_COUNTDOWN = "Next level starts in: ";
+    private string STRING_WAVE_NUMBER = "Wave number: ";
 
     // Start is called before the first frame update
     void Start()
     {
-        _currentLevel = 1;
+        _currentLevel = 5;
+        _enemySpawnCooldown = _defaultSpawnCooldown;
         setupNextLevel();
     }
 
@@ -68,7 +74,7 @@ public class GameDirector : MonoBehaviour
         _initialEnemyBudget = _enemyBudget;
 
 
-        _enemySpawnCooldown = _enemySpawnCooldown > _minimumEnemySpawnTime ? _enemySpawnCooldown -= 0.15f * _currentLevel : _minimumEnemySpawnTime;
+        _enemySpawnCooldown = _enemySpawnCooldown - 0.15f > _minimumEnemySpawnTime ? _defaultSpawnCooldown - (0.15f * _currentLevel) : _minimumEnemySpawnTime;
 
         // spawn powerup 
         if (_currentLevel != 1) {
@@ -83,6 +89,14 @@ public class GameDirector : MonoBehaviour
         player.checkUpgrades();
         primaryWeapon.checkUpgrades();
 
+        // Increase simultaneous spawns every x levels to maintain game pacing with increased enemy numbers
+        if (_currentLevel % 7 == 0) {
+            maxSimultaneousSpawns++;
+        }
+
+        Debug.Log("Max spawns: " + maxSimultaneousSpawns);
+        Debug.Log("Spawn cooldown: " + _enemySpawnCooldown);
+
         // countdown
         _nextLevelTimer = _timeBetweenLevels;
         nextLevelCountdownText.enabled = true;
@@ -90,6 +104,9 @@ public class GameDirector : MonoBehaviour
         // reset any vars 
         _enemiesKilled = 0;
         enemiesRemainingText.text = STRING_ENEMIES_REMAINING + _initialEnemyBudget;
+
+        waveNumberText.text = STRING_WAVE_NUMBER + _currentLevel;
+
         _hasPreparedNextLevel = true;
     }
 
@@ -101,11 +118,7 @@ public class GameDirector : MonoBehaviour
             _hasRerolledSpawn = true;
         }
 
-        int numberToSpawn = 1;
-
-        if (_currentLevel % 10 == 0 && _currentLevel < 50) {
-            numberToSpawn = 1 + _currentLevel / 10; 
-        }
+        int numberToSpawn = maxSimultaneousSpawns;
 
         if (numberToSpawn > _enemyBudget) numberToSpawn = _enemyBudget;
 
