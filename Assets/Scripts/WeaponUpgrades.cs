@@ -71,6 +71,7 @@ public static class WeaponUpgrades
         Upgrade upgradeGiven;
 
         if (randomValue < 100) {
+        if (randomValue < 10) {
             Upgrade upgrade = _getRandomRareUpgrade();
 
             Debug.Log("Chose " + upgrade.upgradeAnnounceText);
@@ -78,9 +79,7 @@ public static class WeaponUpgrades
             Debug.Log("Does it allow duplicates? " + !upgrade.preventDuplicates);
 
             while (!isValidUpgrade(upgrade)) {
-                Debug.Log("This was not valid: " + upgrade.upgradeAnnounceText);
                 upgrade = _getRandomRareUpgrade();
-                Debug.Log("This was not re-rolled: " + upgrade.upgradeAnnounceText);
             }
 
             addUpgrade(upgrade.upgradeName);
@@ -123,10 +122,9 @@ public static class WeaponUpgrades
     }
 
     private static bool isValidUpgrade(Upgrade upgrade) {
-        bool allowsDuplicates = upgrade.preventDuplicates == false;
-        bool disallowsDuplicatesButNoneAcquired = (upgrade.preventDuplicates == true && upgrade.numberAcquired == 0);
         bool hasDisqualifyingItem = getUpgradeCountByName(upgrade.preventDropIfAcquiredUpgrade) == 0;
 
-        return allowsDuplicates || disallowsDuplicatesButNoneAcquired;
+
+        return upgrade.preventDuplicates == false || getUpgradeCountByName(upgrade.upgradeName) == 0;
     }
 }
