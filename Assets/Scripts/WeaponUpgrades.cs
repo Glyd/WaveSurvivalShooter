@@ -70,7 +70,6 @@ public static class WeaponUpgrades
         int randomValue = Random.Range(0, 100);
         Upgrade upgradeGiven;
 
-        if (randomValue < 100) {
         if (randomValue < 10) {
             Upgrade upgrade = _getRandomRareUpgrade();
 
