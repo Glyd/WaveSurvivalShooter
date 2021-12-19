@@ -8,6 +8,7 @@ public class GameDirector : MonoBehaviour
     public EnemySpawner topLeftSpawnPoint;
     public EnemySpawner topRightSpawnPoint;
     public EnemySpawner bottomLeftSpawnPoint;
+    public GameObject upgradePanel;
     public Text enemiesRemainingText;
     public Text nextLevelCountdownText;
     public Text upgradeAnnouncementText;
@@ -36,8 +37,7 @@ public class GameDirector : MonoBehaviour
     private bool _levelInProgress;
 
     private string STRING_ENEMIES_REMAINING = "Enemies remaining: ";
-    private string STRING_NEXT_LEVEL_COUNTDOWN = "Next level starts in: ";
-    private string STRING_WAVE_NUMBER = "Wave number: ";
+    private string STRING_NEXT_LEVEL_COUNTDOWN = "Next wave in: ";
 
     // Start is called before the first frame update
     void Start()
@@ -79,11 +79,9 @@ public class GameDirector : MonoBehaviour
         // spawn powerup 
         if (_currentLevel != 1) {
             Upgrade upgradeRecieved = WeaponUpgrades.giveRandomUpgrade();
-            upgradeAnnouncementText.enabled = true;
             upgradeItemText.text = upgradeRecieved.upgradeAnnounceText.Replace("{0}", WeaponUpgrades.getUpgradeCountByName(upgradeRecieved.upgradeName).ToString());
-            upgradeItemDescription.text = upgradeRecieved.upgradeAnnounceDescription; 
-            upgradeItemText.enabled = true;
-            upgradeItemDescription.enabled = true;
+            upgradeItemDescription.text = upgradeRecieved.upgradeAnnounceDescription;
+            upgradePanel.SetActive(true);
         }
 
         player.checkUpgrades();
@@ -105,7 +103,7 @@ public class GameDirector : MonoBehaviour
         _enemiesKilled = 0;
         enemiesRemainingText.text = STRING_ENEMIES_REMAINING + _initialEnemyBudget;
 
-        waveNumberText.text = STRING_WAVE_NUMBER + _currentLevel;
+        waveNumberText.text = _currentLevel.ToString();
 
         _hasPreparedNextLevel = true;
     }
@@ -153,9 +151,7 @@ public class GameDirector : MonoBehaviour
             _levelInProgress = true;
             _hasPreparedNextLevel = false;
             nextLevelCountdownText.enabled = false;
-            upgradeAnnouncementText.enabled = false;
-            upgradeItemText.enabled = false;
-            upgradeItemDescription.enabled = false;
+            upgradePanel.SetActive(false);
         }
     }
 
