@@ -42,7 +42,7 @@ public class GameDirector : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        _currentLevel = 5;
+        _currentLevel = 1;
         _enemySpawnCooldown = _defaultSpawnCooldown;
         setupNextLevel();
     }

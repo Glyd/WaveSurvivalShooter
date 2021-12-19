@@ -10,7 +10,7 @@ public class PrimaryWeapon : MonoBehaviour
     private float _shotCooldown;
     private float _nextShotTimer = 0f;
     private float _timer = 0f;
-    private int _baseDamage = 255;
+    private int _baseDamage = 25;
     private int _damage;
     private PlayerController _player;
     private Vector3 _rotation;
