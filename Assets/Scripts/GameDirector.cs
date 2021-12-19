@@ -38,6 +38,7 @@ public class GameDirector : MonoBehaviour
 
     private string STRING_ENEMIES_REMAINING = "Enemies remaining: ";
     private string STRING_NEXT_LEVEL_COUNTDOWN = "Next wave in: ";
+    private string STRING_WAVE_TEXT = "Wave ";
 
     // Start is called before the first frame update
     void Start()
@@ -103,7 +104,7 @@ public class GameDirector : MonoBehaviour
         _enemiesKilled = 0;
         enemiesRemainingText.text = STRING_ENEMIES_REMAINING + _initialEnemyBudget;
 
-        waveNumberText.text = _currentLevel.ToString();
+        waveNumberText.text = STRING_WAVE_TEXT + _currentLevel;
 
         _hasPreparedNextLevel = true;
     }
