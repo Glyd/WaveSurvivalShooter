@@ -7,6 +7,8 @@ public class PlayerController : MonoBehaviour
     Rigidbody2D body;
 
     public GameObject shield;
+    public GameController gameController;
+    public StatTracker statTracker;
 
     private int _basePlayerHealth = 100;
     private int _maxPlayerHealth = 100;
@@ -28,8 +30,12 @@ public class PlayerController : MonoBehaviour
 
     void Start() {
         body = GetComponent<Rigidbody2D>();
+
         _currentPlayerHealth = _basePlayerHealth;
+        gameController.setHealthText(_currentPlayerHealth);
+
         _runSpeed = _baseRunSpeed;
+
         shield.SetActive(false);
     }
 
@@ -58,10 +64,6 @@ public class PlayerController : MonoBehaviour
 
         if (!_isBeingKnockedBack)
             body.velocity = new Vector2(horizontal * _runSpeed, vertical * _runSpeed);
-
-        if (Input.GetKeyDown("f")) {
-            WeaponUpgrades.giveRandomUpgrade();
-        }
     }
 
     public void takeDamage(int damageAmount, Collider2D enemyCollider) {
@@ -73,10 +75,15 @@ public class PlayerController : MonoBehaviour
             else {
                 shield.SetActive(false);
                 _currentPlayerHealth -= damageAmount;
-                StartCoroutine(_knockbackHandling(enemyCollider));
-            }
-                
+                statTracker.addDamageTaken((int)damageAmount);
 
+                if (_currentPlayerHealth > 0) {
+                    gameController.setHealthText(_currentPlayerHealth);
+                    StartCoroutine(_knockbackHandling(enemyCollider));
+                } else {
+                    gameController.startGameOver();
+                }
+            }
         }
     }
 
@@ -90,6 +97,7 @@ public class PlayerController : MonoBehaviour
 
     public void heal(int amount) {
         _currentPlayerHealth = (_currentPlayerHealth + amount > _maxPlayerHealth) ? _maxPlayerHealth : _currentPlayerHealth + amount;
+        gameController.setHealthText(_currentPlayerHealth);
     }
 
     private IEnumerator _knockbackHandling(Collider2D enemyCollider) {
@@ -107,6 +115,8 @@ public class PlayerController : MonoBehaviour
             heal(20);
         }
         _previousMaxHealth = _maxPlayerHealth;
+        gameController.setHealthText(_currentPlayerHealth);
+
         _runSpeed = _baseRunSpeed + 7 * WeaponUpgrades.getUpgradeCountByName(STRINGS.UPGRADE_PLAYER_SPEED);
 
         _maxShieldAmount = 3 * WeaponUpgrades.getUpgradeCountByName(STRINGS.UPGRADE_PLAYER_SHIELD);

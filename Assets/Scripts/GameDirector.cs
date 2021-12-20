@@ -15,6 +15,7 @@ public class GameDirector : MonoBehaviour
     public Text upgradeItemText;
     public Text upgradeItemDescription;
     public Text waveNumberText;
+    public StatTracker statTracker;
 
     public PlayerController player;
     public PrimaryWeapon primaryWeapon;
@@ -23,7 +24,7 @@ public class GameDirector : MonoBehaviour
     private int _enemyBudget;
     private int maxSimultaneousSpawns = 1;
     private float _nextLevelTimer;
-    private float _timeBetweenLevels = 5.0f;
+    private float _timeBetweenLevels = 3.0f;
     private float _defaultSpawnCooldown = 3.0f;
     private float _enemySpawnCooldown;
     private float _minimumEnemySpawnTime = 0.45f;
@@ -68,14 +69,18 @@ public class GameDirector : MonoBehaviour
         if (_levelInProgress && _enemyBudget > 0 && _currentLevelTimer > _nextSpawnTime) {
             spawnEnemy();
         }
+
+        // cheat to add upgrades
+        if (Input.GetKeyDown("f")) {
+            WeaponUpgrades.giveRandomUpgrade();
+            player.checkUpgrades();
+            primaryWeapon.checkUpgrades();
+        }
     }
 
     private void setupNextLevel() {
         _enemyBudget = _currentLevel * 3;
         _initialEnemyBudget = _enemyBudget;
-
-
-        _enemySpawnCooldown = _enemySpawnCooldown - 0.15f > _minimumEnemySpawnTime ? _defaultSpawnCooldown - (0.15f * _currentLevel) : _minimumEnemySpawnTime;
 
         // spawn powerup 
         if (_currentLevel != 1) {
@@ -83,6 +88,8 @@ public class GameDirector : MonoBehaviour
             upgradeItemText.text = upgradeRecieved.upgradeAnnounceText.Replace("{0}", WeaponUpgrades.getUpgradeCountByName(upgradeRecieved.upgradeName).ToString());
             upgradeItemDescription.text = upgradeRecieved.upgradeAnnounceDescription;
             upgradePanel.SetActive(true);
+
+            _enemySpawnCooldown = _enemySpawnCooldown - 0.15f > _minimumEnemySpawnTime ? _defaultSpawnCooldown - (0.15f * _currentLevel) : _minimumEnemySpawnTime;
         }
 
         player.checkUpgrades();
@@ -93,9 +100,6 @@ public class GameDirector : MonoBehaviour
             maxSimultaneousSpawns++;
         }
 
-        Debug.Log("Max spawns: " + maxSimultaneousSpawns);
-        Debug.Log("Spawn cooldown: " + _enemySpawnCooldown);
-
         // countdown
         _nextLevelTimer = _timeBetweenLevels;
         nextLevelCountdownText.enabled = true;
@@ -105,6 +109,7 @@ public class GameDirector : MonoBehaviour
         enemiesRemainingText.text = STRING_ENEMIES_REMAINING + _initialEnemyBudget;
 
         waveNumberText.text = STRING_WAVE_TEXT + _currentLevel;
+        statTracker.setWave(_currentLevel);
 
         _hasPreparedNextLevel = true;
     }
@@ -142,6 +147,7 @@ public class GameDirector : MonoBehaviour
     // Used by enemies to notify game director of their death.
     public void reportDeath() {
         _enemiesKilled += 1;
+        statTracker.addKill();
         enemiesRemainingText.text = STRING_ENEMIES_REMAINING + (_initialEnemyBudget - _enemiesKilled);
     }
 

@@ -7,6 +7,7 @@ public class Enemy : MonoBehaviour
 {
     public GameObject heartPickupPrefab;
 
+    private StatTracker _statTracker;
     private float _health = 100;
     private int _contactDamage = 10;
     private AIDestinationSetter destinationSetter;
@@ -19,7 +20,6 @@ public class Enemy : MonoBehaviour
     private bool _reportedDeath = false;
     private int heartDropRate = 5; // percentage
     private int _currentLevel = 0;
-    private int _levelLastBuffed;
 
     // Start is called before the first frame update
     void Start()
@@ -31,20 +31,11 @@ public class Enemy : MonoBehaviour
         destinationSetter.target = _playerTransform;
         _collider = GetComponent<Collider2D>();
         _gameDirector = GameObject.FindWithTag("GameDirector").GetComponent<GameDirector>();
-
+        _statTracker = GameObject.Find("Stats").GetComponent<StatTracker>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        if (_health <= 0) {
-            handleDeath();
-        }
-
-        if (_currentLevel % 5 == 0 && _levelLastBuffed != _currentLevel) {
+        if (_currentLevel % 5 == 0) {
             _increaseStats();
-            _levelLastBuffed = _currentLevel;
         }
     }
 
@@ -71,8 +62,14 @@ public class Enemy : MonoBehaviour
 
     public void takeDamage(float damageAmount, Collider2D projectileCollider) {
         _health -= damageAmount;
-        StartCoroutine(_knockbackHandling(projectileCollider));
-        StartCoroutine(_flashOnHit());
+        _statTracker.addDamageDealt((int)damageAmount);
+
+        if (_health <= 0) {
+            handleDeath();
+        } else {
+            StartCoroutine(_knockbackHandling(projectileCollider));
+            StartCoroutine(_flashOnHit());
+        }
     }
 
     public void setHealth(int health) {

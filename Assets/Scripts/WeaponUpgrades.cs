@@ -50,6 +50,12 @@ public static class WeaponUpgrades
         }
     }
 
+    public static void removeAllUpgrades() {
+        for (int i = 0; i < allUpgrades.Length; i++) {
+                allUpgrades[i].numberAcquired = 0;
+        }
+    }
+
     public static int getUpgradeCountByName(string upgradeName) {
         int count = 0;
 
