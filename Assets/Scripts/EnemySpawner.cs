@@ -36,8 +36,16 @@ public class EnemySpawner : MonoBehaviour
         spawnPos.y += yPositionOffset;
 
         GameObject enemy = Instantiate(meleeEnemyPrefab, spawnPos, _spawnLocation.rotation);
+        Enemy enemyScript = enemy.GetComponent<Enemy>();
 
-        enemy.GetComponent<Enemy>().setCurrentLevel(currentLevel);
+        enemyScript.setCurrentLevel(currentLevel);
+        if (playerHasUpgrade(STRINGS.UPGRADE_WEAPON_ELECTRIC)) 
+            enemyScript.playerHasElectric = true;
+    }
 
+    private bool playerHasUpgrade(string upgradeName) {
+        bool hasUpgrade = WeaponUpgrades.getUpgradeCountByName(upgradeName) >= 1;
+
+        return hasUpgrade;
     }
 }

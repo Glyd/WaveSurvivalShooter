@@ -11,6 +11,7 @@ public static class STRINGS
     public static string UPGRADE_PLAYER_SPEED = "playerSpeed";
     public static string UPGRADE_WEAPON_FIRE_RATE = "weaponFireRate";
     public static string UPGRADE_WEAPON_TRIAD = "weaponTriadShot";
+    public static string UPGRADE_WEAPON_ELECTRIC = "weaponElectric";
     public static string UPGRADE_WEAPON_PENTAD = "weaponPentadShot";
     public static string UPGRADE_WEAPON_BOUNCY = "weaponBouncyShot";
     public static string UPGRADE_PLAYER_SHIELD = "playerShield";
@@ -22,6 +23,7 @@ public static class STRINGS
     public static string UPGRADE_TITLE_PLAYER_SPEED = "Movement speed increased! ({0})";
     public static string UPGRADE_TITLE_WEAPON_FIRE_RATE = "Fire rate increased! ({0})";
     public static string UPGRADE_TITLE_WEAPON_TRIAD = "Triad Shot! ({0})";
+    public static string UPGRADE_TITLE_WEAPON_ELECTRIC = "Electric Bullets! ({0})";
     public static string UPGRADE_TITLE_WEAPON_PENTAD = "Pentad Shot! ({0})";
     public static string UPGRADE_TITLE_WEAPON_BOUNCY = "Bouncing bullets! ({0})";
     public static string UPGRADE_TITLE_PLAYER_SHIELD = "Personal shield! ({0})";
@@ -33,6 +35,7 @@ public static class STRINGS
     public static string UPGRADE_DESCRIPTION_PLAYER_SPEED = "You move faster.";
     public static string UPGRADE_DESCRIPTION_WEAPON_FIRE_RATE = "You can shoot faster.";
     public static string UPGRADE_DESCRIPTION_WEAPON_TRIAD = "Triple the projectiles, triple the power!";
+    public static string UPGRADE_DESCRIPTION_WEAPON_ELECTRIC = "...and his music was electric.";
     public static string UPGRADE_DESCRIPTION_WEAPON_PENTAD = "...that's a lot of bullets.";
     public static string UPGRADE_DESCRIPTION_WEAPON_BOUNCY = "Your projectiles can bounce, one time per stack.";
     public static string UPGRADE_DESCRIPTION_PLAYER_SHIELD = "A protective barrier that absorbs 3 hits per stack. Regenerates each wave.";

@@ -46,6 +46,7 @@ public class Projectile : MonoBehaviour
         if (_projectileCurrentTravelTime >= _projectileMaxTravelTime) Destroy(gameObject);
     }
 
+    // TODO refactor
     private bool isWorldHit(Collision2D collision) {
 
         bool isWorldHit;
@@ -97,7 +98,6 @@ public class Projectile : MonoBehaviour
                 Destroy(gameObject);
         }
     }
-
 
     //used by PrimaryWeapon to cut down on calls
     public void setupProjectile(int damage, int speedUpgradeCount, int rangeUpgradeCount, int bounceUpgradeCount) {

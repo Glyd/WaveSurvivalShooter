@@ -6,11 +6,14 @@ using Pathfinding;
 public class Enemy : MonoBehaviour
 {
     public GameObject heartPickupPrefab;
+    public Material defaultSpriteMat;
 
     private StatTracker _statTracker;
     private float _health = 100;
     private int _contactDamage = 10;
     private AIDestinationSetter destinationSetter;
+    private LineRenderer lineRenderer;
+
     private AIPath _aiPath;
     private Transform _playerTransform;
     private Rigidbody2D _body;
@@ -20,6 +23,11 @@ public class Enemy : MonoBehaviour
     private bool _reportedDeath = false;
     private int heartDropRate = 5; // percentage
     private int _currentLevel = 0;
+    private bool hasTakenElectricDamage = false;
+    private int electricDamage = 15;
+
+    // Upgrades that need setting
+    public bool playerHasElectric = false;
 
     // Start is called before the first frame update
     void Start()
@@ -33,6 +41,10 @@ public class Enemy : MonoBehaviour
         _gameDirector = GameObject.FindWithTag("GameDirector").GetComponent<GameDirector>();
         _statTracker = GameObject.Find("Stats").GetComponent<StatTracker>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
+        lineRenderer = GetComponent<LineRenderer>(); ;
+
+        lineRenderer.material = defaultSpriteMat;
+
 
         if (_currentLevel % 5 == 0) {
             _increaseStats();
@@ -60,9 +72,49 @@ public class Enemy : MonoBehaviour
         return gameObject != null && collision.gameObject.CompareTag("Player");
     }
 
+    public void takeDamage(float damageAmount) {
+        _health -= damageAmount;
+        _statTracker.addDamageDealt((int)damageAmount);
+        if ( playerHasElectric &&  !hasTakenElectricDamage) { 
+            hasTakenElectricDamage = true; 
+            handleElectricUpgrade(); 
+        }
+
+        if (_health <= 0) {
+            handleDeath();
+        }
+        else {
+            StartCoroutine(_flashOnHit());
+        }
+    }
+
+    //Delayed damage to create visible chain effect rather than instananeous mass-hits
+    public IEnumerator takeElectricDamage(float damageAmount) {
+        yield return new WaitForSeconds(0.2f);
+
+        _health -= damageAmount;
+        _statTracker.addDamageDealt((int)damageAmount);
+
+        if ( !hasTakenElectricDamage) { 
+            hasTakenElectricDamage = true;
+            handleElectricUpgrade();
+        }
+
+        if (_health <= 0) {
+            handleDeath();
+        }
+        else {
+            StartCoroutine(_flashOnHit());
+        }
+    }
+
     public void takeDamage(float damageAmount, Collider2D projectileCollider) {
         _health -= damageAmount;
         _statTracker.addDamageDealt((int)damageAmount);
+        if (playerHasElectric && !hasTakenElectricDamage) { 
+            hasTakenElectricDamage = true; 
+            handleElectricUpgrade(); 
+        }
 
         if (_health <= 0) {
             handleDeath();
@@ -106,5 +158,46 @@ public class Enemy : MonoBehaviour
 
     public void setCurrentLevel(int currentLevel) {
         _currentLevel = currentLevel;
+    }
+
+    private void handleElectricUpgrade() {
+        if (Random.Range(0, 100) <= 25) {
+            Collider2D[] colliders = Physics2D.OverlapCircleAll(new Vector2(transform.position.x, transform.position.y), 50f);
+
+            foreach (Collider2D collider in colliders) {
+                if (collider.gameObject.CompareTag("Enemy") && !collider.gameObject.GetComponent<Enemy>().hasTakenElectricDamage) {
+                    Enemy enemy = collider.gameObject.GetComponent<Enemy>();
+
+                    StartCoroutine(enemy.takeElectricDamage(electricDamage));
+
+                    StartCoroutine(drawElectricLine(collider.gameObject.transform.position));
+                    StartCoroutine(resetElectricDamageDelayed(enemy));
+                }
+            }
+        }
+    }
+
+    IEnumerator drawElectricLine(Vector3 enemyPosition) {
+        lineRenderer.enabled = true;
+
+        Vector3[] positions = { enemyPosition, transform.position };
+
+
+        lineRenderer.startColor = Color.blue;
+        lineRenderer.endColor = Color.blue;
+        lineRenderer.startWidth = 0.4f;
+        lineRenderer.endWidth = 0.4f;
+        lineRenderer.SetPositions(positions);
+        lineRenderer.useWorldSpace = true;
+
+        yield return new WaitForSeconds(0.2f);
+
+        lineRenderer.enabled = false;
+    }
+
+    IEnumerator resetElectricDamageDelayed(Enemy enemy) {
+        yield return new WaitForSeconds(0.2f);
+        hasTakenElectricDamage = false;
+        enemy.hasTakenElectricDamage = false;
     }
 }
